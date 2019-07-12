@@ -118,7 +118,7 @@ class ErrorPagesCommand extends ContainerAwareCommand
     ) {
         $this->path = $input->getOption('path');
         $this->destinationPath = $this->path . '/TwigBundle';
-        $this->sourcePath = '../../vendor/brookinsconsulting/bcerrorpagesbundle/BrookinsConsulting/BcErrorPagesBundle/Resources/TwigBundle';
+        $this->sourcePath = '../../vendor/websoftix/bcerrorpagesbundle/BrookinsConsulting/BcErrorPagesBundle/Resources/TwigBundle';
 
         // Detect installation method: relative, absolute, copy
         if($this->relative === true && $this->absolute === true) {
