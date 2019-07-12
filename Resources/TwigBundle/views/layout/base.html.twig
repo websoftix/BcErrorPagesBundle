@@ -1,30 +1,175 @@
 <!DOCTYPE html>
-<html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if lt IE 9 ]><html class="unsupported-ie ie" lang="en"><![endif]-->
+<!--[if IE 9 ]><html class="ie ie9" lang="en"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!--<![endif]-->
+{% if ezpublish.legacy.has( 'content_info' ) %}
+    {% set content_info = ezpublish.legacy.get( 'content_info' ) %}
+{% endif %}
+{% if module_result is defined %}
+    {% set content_info = { class_identifier: '' } %}
+{% else %}
+    {% set module_result = ezpublish.legacy.all %}
+{% endif %}
+
+{% set uiContext = '' %}
+{% set uiComponent = '' %}
+{% if module_result.ui_context is defined %}
+    {% set uiContext = module_result['ui_context'] %}
+    {% set uiComponent = module_result['ui_component'] %}
+    {% set currentLocation = { id: '' } %}
+{% endif %}
+{% set userType = "client" %}
+{% set wide_pages_array = [ 'jobfolder', 'job_archive_folder', 'project_folder' ] %}
+{% if app.user.apiuser.content.fields.sub_id is defined %}
+    {% set userType = "subcontractor" %}
+{% endif %}
+
+{% if location is defined and not location.isDraft %}
+    {% set currentLocation = location %}
+{% endif %}
 <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <meta charset="{{ _charset }}" />
-    <title>Brookins Consulting : {% block title %}An Error Occurred: {{ status_text }}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ asset('bundles/bcerrorpages/css/screen.css') }}" type="text/css" media="screen" />
+    {% include 'DbiOutscribeSecureBundle::xajax.html.twig' %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    {% if userType == 'subcontractor' %}
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>{{ "Steam on"|trans }}</title>
+        <meta name="keywords" content="online transcription, digital transcription, medical transcription, legal transcription, transcribe, transcriber, transcribing, dictation, fast, secure, reliable, affordable, specialised, quick, cheap, type, typing, quickscribe, Australia, Adelaide, Sydney, Canberra, Melbourne, Brisbane, Perth, transcription, digital, express scribe, philips, olympus, lanier, sony, online, dictaphone, New Zealand, phillips, quikscribe, winscribe" />
+        <meta name="description" content="Online Digital Transcription Services" />
+        <meta name="MSSmartTagsPreventParsing" content="TRUE" />
+        <meta name="generator" content="eZ Publish" />
+    {% else %}
+        {% set name = 'Path' %}
+        {% set path = module_result.path %}
+        {% set reverse_path = [] %}
+        {% set siteTitle = '' %}
+        {% if module_result.title_path is defined %}
+            {% set path = module_result.title_path %}
+        {% endif %}
+        {% for i in path|length - 1..0 %}
+            {% set reverse_path = reverse_path|merge([path[i]]) %}
+        {% endfor %}
+        {% for item in reverse_path %}
+            {% set siteTitle = siteTitle ~ item['text'] %}
+            {% if not loop.last %}
+                {% set siteTitle = siteTitle ~ ' / ' %}
+            {% endif %}
+        {% endfor %}
+
+        {% set siteTitle = siteTitle ~ " - OutScribe" %}
+
+        <title>{{ siteTitle }}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="online transcription, digital transcription, medical transcription, legal transcription, transcribe, transcriber, transcribing, dictation, fast, secure, reliable, affordable, specialised, quick, cheap, type, typing, quickscribe, Australia, Adelaide, Sydney, Canberra, Melbourne, Brisbane, Perth, transcription, digital, express scribe, philips, olympus, lanier, sony, online, dictaphone, New Zealand, phillips, quikscribe, winscribe" />
+        <meta name="description" content="Online Digital Transcription Services" />
+        <meta name="generator" content="eZ Publish" />
+        <script type="text/javascript">
+        (function() {
+            var head = document.getElementsByTagName('head')[0];
+            var printNode = document.createElement('link');
+            printNode.rel = 'Alternate';
+            printNode.href = "layout/set/print/" + document.location.search;
+            printNode.media = 'print';
+            printNode.title = "{{ 'Printable version'|trans }}";
+            head.appendChild(printNode);
+
+        })();
+        </script>
+    {% endif %}
+
+    <link rel="Shortcut icon" href="{{ asset( "bundles/dbioutscribesecure/images/favicon.ico" ) }}" type="image/x-icon" />
+
+
+    {% include 'DbiOutscribeSecureBundle::page_head_style.html.twig' %}
+    {% include 'DbiOutscribeSecureBundle::page_head_script.html.twig' %}
+    {% if content_info.class_identifier == 'job_folder' %}
+        <meta http-equiv="refresh" content="300" />
+    {% endif %}
 </head>
-<body id="home">
+<body {% if class_type is defined and uiContext == 'edit' and class_type == 'job' %} onload="changeValue();"{% endif %}>
+   {{ render( controller( "DbiOutscribeSecureBundle:Menu:superfish", { 'nodeID': currentLocation.id, 'uiContext': uiContext, 'uiComponent': uiComponent} ) ) }}
+    {% if is_granted( 'ROLE_PREVIOUS_ADMIN' ) %}
+        <div id="switch-back-to-admin">
+            <a href="{{ path( ezpublish.rootLocation, {'_switch_user': '_exit'}) }}">Switch back to admin</a>
+        </div>
+    {% endif %}
+    <div id="allcontent">
+        <div id="columns">
+            <hr class="hide" />
+            {% if content_info.class_identifier not in wide_pages_array and
+                  uiContext != 'edit' and
+                  uiContext != 'administration' and
+                  uiComponent != 'invoice' %}
+            <div id="leftcolumn">
+		<div id="leftcolumn-design">
+                    <h3 class="hide">Dictation System</h3>
+                    <div>
+                        <img src={{ asset( 'bundles/dbioutscribesecure/images/search_banner.png' ) }} height="25" width="213" alt="Search OutScribe" /></div>
+                        <div class="toolbox">
+                            <img style="float: left" src={{ asset( 'bundles/dbioutscribesecure/images/left_search.gif' ) }} height="40" width="3" alt="" />
+                            <img style="float: right" src={{ asset( 'bundles/dbioutscribesecure/images/right_search.gif' ) }} height="40" width="4" alt="" />
+                            <div class="toolbox-design">
+                               <div style="padding: 11px 0 0 6px; height: 29px;" class="toolbox-content">
+                                   <form action="/content/search/" method="get">
+                                        <input class="searchtext" type="text" size="10" name="SearchText" id="Search" value="" />
+                                            <input name="SubTreeArray" value="103" type="hidden" />
+                                            <input type="image" class="searchimage" src={{ asset( 'bundles/dbioutscribesecure/images/go_icon.gif' ) }} alt="Search" />
+                                   </form>
+                               </div>
+                            </div>
+                        </div>
+		</div>
+		<div><img src={{ asset( 'bundles/dbioutscribesecure/images/contact_banner.png' ) }} height="25" width="213" alt="Contact OutScribe" /></div>
+		<div class="contact">
+			Email: <a href="mailto:info@outscribe.com.au">info@outscribe.com.au</a><br />
+			Phone: +61 8 8121 2062<br />
+		</div>
+                {% include "design:survey/wouldBeGreatSurvey.tpl" %}
+            </div>
+            {% endif %}
+            <hr class="hide" />
+            {% if content_info.class_identifier not in wide_pages_array and
+                  uiContext != 'edit' and
+                  uiContext != 'administration' and
+                  uiContext != 'invoice' %}
+            <div id="maincontent" class="maincontent-norightmenu">
+            {% else %}
+            <div id="maincontent" class="maincontent-nomenus">
+            {% endif %}
+                <div id="fix">
+                    <div id="maincontent-design">
+                        {% block content %}
+                            {% if module_result.errorCode is defined %}
+                                <h1>{{ module_result.errorMessage }} ({{ module_result.errorCode }})</h1>
+                                {{ module_result.content|raw }}
+                            {% else %}
+                                {{ module_result.content|raw }}
+                            {% endif %}
+                            {% block shield %}
+                                {% block body %}{% endblock %}
+                            {% endblock %}
+                        {% endblock %}
 
-{% block shield %}
-<div id="logo">
-    <h1 class="hidden">Brookins Consulting</h1>
-</div>
-
-<div id="searchform">
-    <p>Brookins Consulting</p>
-</div>
-
-<div id="content">
-    {% block body %}{% endblock %}
-</div>
-
-<p class="small">
-    <a href="//brookinsconsulting.com/About">About Brookins Consulting</a> - <a href="//brookinsconsulting.com">Go to brookinsconsulting.com!</a>
-</p>
-{% endblock %}
-
+                    </div>
+                    <div class="break"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer">
+        <div id="footer-design">
+            <address>
+                <br />
+                <span class="credits">
+                    <a href="/Media/tcs/TERMS-CONDITIONS">Terms &amp; Conditions</a> . <a href="/Media/tcs/PRIVACY-POLICY">Privacy Policy</a> . Copyright &copy; 2004-{{ "now"|date("Y") }} OutScribe Pty Limited, All Rights Reserved.
+                </span>
+            </address>
+        </div>
+    </div>
 </body>
 </html>
+
