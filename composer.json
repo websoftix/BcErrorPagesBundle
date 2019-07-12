@@ -1,5 +1,5 @@
 {
-    "name": "brookinsconsulting/bcerrorpagesbundle",
+    "name": "websoftix/bcerrorpagesbundle",
     "description": "BC Error Pages Bundle for Symfony 3. Provides a basic solution to override the default Symfony error pages template code and styles with designer friendly alternatives. Great for developers seeking to override default error pages in Symfony.",
     "type" : "library",
     "keywords" : [ "Symfony", "error", "pages", "templates", "customize" ],
